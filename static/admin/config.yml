@@ -1,18 +1,77 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: mayank221189/hugo-netlify-cms # Path to your GitHub repository
   branch: development # Branch to update (optional; defaults to master)
-media_folder: static/img
-public_folder: /img
+# By default, saving a post in the CMS interface pushes a commit directly to the publication branch specified in backend. However, you also have the option to enable the Editorial Workflow, which adds an interface for drafting, reviewing, and approving posts. To do this, add the following line to your Netlify CMS config.yml:
+# This line should *not* be indented
+publish_mode: editorial_workflow
+# These lines should *not* be indented
+media_folder: 'static/images/uploads' # Media files will be stored in the repo under static/images/uploads
+public_folder: '/images/uploads' # The src attribute for uploaded media will begin with /images/uploads
 collections:
-  - name: 'blog'
-    label: 'Blog'
-    folder: 'content/blog'
-    create: true
-    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
+  - name: 'blog' # Used in routes, e.g., /admin/collections/blog
+    label: 'Blog' # Used in the UI
+    folder: 'content/blog' # The path to the folder where the documents are stored
+    create: true # Allow users to create new documents in this collection
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}' # Filename template, e.g., YYYY-MM-DD-title.md
     editor:
       preview: true
+    fields: # The fields for each document, usually in front matter
+      - {label: 'Layout', name: 'layout', widget: 'hidden', default: 'blog'}
+      - {label: 'Title', name: 'title', widget: 'string'}
+      - {label: 'Publish Date', name: 'date', widget: 'datetime'}
+      - {label: 'Featured Image', name: 'thumbnail', widget: 'image'}
+      - {label: 'Rating (scale of 1-5)', name: 'rating', widget: 'number'}
+      - {label: 'Body', name: 'body', widget: 'markdown'}
+  - label: 'Blog in English'
+    name: 'Posts in English'
+    folder: 'content/posts/en'
+    create: true # Allow users to create new documents in this collection
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}' # Filename template, e.g., YYYY-MM-DD-title.md
+    editor:
+      preview: true
+    filter: {field: 'language', value: 'en'}
     fields:
-      - { label: 'Title', name: 'title', widget: 'string' }
-      - { label: 'Publish Date', name: 'date', widget: 'datetime' }
-      - { label: 'Description', name: 'description', widget: 'string' }
-      - { label: 'Body', name: 'body', widget: 'markdown' }
+      - {label: 'Language', name: 'language', widget: 'select', options: ['en', 'es']}
+      - {label: 'Title', name: 'title', widget: 'string'}
+      - {label: 'Content', name: 'body', widget: 'markdown'}
+  - label: 'Blog en Español'
+    name: 'Posts in Spnaish'
+    folder: 'content/posts/es'
+    create: true # Allow users to create new documents in this collection
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}' # Filename template, e.g., YYYY-MM-DD-title.md
+    editor:
+      preview: true
+    filter: {field: 'language', value: 'es'}
+    fields:
+      - {label: 'Lenguaje', name: 'language', widget: 'select', options: ['en', 'es']}
+      - {label: 'Titulo', name: 'title', widget: 'string'}
+      - {label: 'Contenido', name: 'body', widget: 'markdown'}
+  - label: 'Pages'
+    name: 'pages'
+    files:
+      - label: 'About Page'
+        name: 'about'
+        file: 'site/content/about.yml'
+        fields:
+          - {label: Title, name: title, widget: string}
+          - {label: Intro, name: intro, widget: markdown}
+          - label: Team
+            name: team
+            widget: list
+            fields:
+              - {label: Name, name: name, widget: string}
+              - {label: Position, name: position, widget: string}
+              - {label: Photo, name: photo, widget: image}
+      - label: 'Locations Page'
+        name: 'locations'
+        file: 'site/content/locations.yml'
+        fields:
+          - {label: Title, name: title, widget: string}
+          - {label: Intro, name: intro, widget: markdown}
+          - label: Locations
+            name: locations
+            widget: list
+            fields:
+              - {label: Name, name: name, widget: string}
+              - {label: Address, name: address, widget: string}
